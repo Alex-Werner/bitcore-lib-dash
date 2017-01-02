@@ -198,10 +198,8 @@ describe('Proposal', function() {
     });
 
     it('should create a new proposal from a hex string', function(){
-        var govObject = bitcore.GovObject;
-        govObject.prototype = Proposal.prototype;
-
-        var proposal = new govObject(expectedHex);
+        var Proposal = bitcore.GovObject.Proposal;
+        var proposal = new Proposal(expectedHex);
 
         expect(proposal instanceof Proposal);
         proposal.serialize().should.equal(expectedHex);
