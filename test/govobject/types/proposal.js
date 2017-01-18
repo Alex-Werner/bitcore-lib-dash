@@ -98,7 +98,7 @@ describe('Proposal', function() {
         proposal.network = 'testnet';
         proposal.end_epoch = endDate;
         proposal.name = 'TestProposal';
-        proposal.payment_address = 'XmPtF6UoguyKjRDoavjDgDnxuKEUVs7rLq'; // mainnet address
+        proposal.payment_address = 'XmPtF6UoguyK'; // payment address must be > 26 characters
         proposal.payment_amount = 10;
         proposal.start_epoch = startDate;
         proposal.type = 1;
