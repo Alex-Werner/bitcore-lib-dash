@@ -10,6 +10,10 @@ var GovObject = bitcore.GovObject;
 var Proposal = bitcore.GovObject.Proposal;
 var errors = bitcore.errors;
 
+
+var BufferReader = require('../../lib/encoding/bufferreader');
+
+
 /* FromObject */
 describe('GovObject', function(){
 
@@ -99,10 +103,16 @@ describe('GovObject', function(){
       var govObject = govObject.fromObject(jsonProposal);
 
       var govFromBuffer = new GovObject;
-        govFromBuffer.fromBuffer(govObject.toBuffer()).should.deep.equal(govObject);
-        govFromBuffer.fromBuffer(govObject.toBuffer()).should.not.equal(govObject);
+      govFromBuffer.fromBuffer(govObject.toBuffer()).should.deep.equal(govObject);
+      govFromBuffer.fromBuffer(govObject.toBuffer()).should.not.equal(govObject);
       new GovObject(govObject.toBuffer()).should.deep.equal(govObject);
       new GovObject(govObject.toBuffer()).should.not.equal(govObject);
+
+
+      var reader = new BufferReader(govObject.toBuffer());
+      var fromBuff =govFromBuffer.fromBufferReader(reader);
+      fromBuff.should.deep.equal(govObject);
+      fromBuff.should.not.equal(govObject);
     })
     it('should create a govObject from an Object', function(){
       var govObject = new GovObject;
@@ -237,6 +247,39 @@ describe('GovObject', function(){
       };
       expect(govObjRes).to.throw(Error);
       expect(govObjRes).to.throw('Must provide an object or string to deserialize a transaction');
+    })
+    it('should serialize',function(){
+      var govObject = new GovObject;
+      var jsonProposal = {
+        network:"testnet",
+        name:"TestProposal",
+        start_epoch:Math.round(new Date("2015-10-10").getTime()/1000),
+        end_epoch:Math.round(new Date("2025-10-10").getTime()/1000),
+        payment_address:'yXGeNPQXYFXhLAN1ZKrAjxzzBnZ2JZNKnh',
+        payment_amount:10,
+        type:1,
+        url:"http://www.dash.org"
+      };
+      var govObject = govObject.fromObject(jsonProposal);
+      govObject.serialize().should.equal(expectedHex);
+      govObject.serialize().should.equal(govObject.uncheckedSerialize());
+    });
+    it('should be able to inspect a govObject', function(){
+      var govObject = new GovObject;
+      var jsonProposal = {
+        network:"testnet",
+        name:"TestProposal",
+        start_epoch:Math.round(new Date("2015-10-10").getTime()/1000),
+        end_epoch:Math.round(new Date("2025-10-10").getTime()/1000),
+        payment_address:'yXGeNPQXYFXhLAN1ZKrAjxzzBnZ2JZNKnh',
+        payment_amount:10,
+        type:1,
+        url:"http://www.dash.org"
+      };
+      var govObject = govObject.fromObject(jsonProposal);
+      govObject.inspect().should.equal("<GovObject: "+expectedHex+">");
+      govObject.inspect().should.equal("<GovObject: "+govObject.uncheckedSerialize()+">");
+
     })
 
   });
