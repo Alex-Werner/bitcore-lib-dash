@@ -19,7 +19,16 @@ var errors = bitcore.errors;
 describe('Proposal', function() {
     var startDate = Math.round(new Date("2015-10-10").getTime()/1000);
     var endDate = Math.round(new Date("2025-10-10").getTime()/1000);
-
+    var validJSONProposal = {
+        network:"testnet",
+        name:"TestProposal",
+        start_epoch:startDate,
+        end_epoch:endDate,
+        payment_address:'yXGeNPQXYFXhLAN1ZKrAjxzzBnZ2JZNKnh',
+        payment_amount:10,
+        type:1,
+        url:"http://www.dash.org"
+      };
     it('should create new proposal', function() {
         var proposal = new Proposal();
 
@@ -50,6 +59,21 @@ describe('Proposal', function() {
         expect(function() {
             return proposal.serialize();
         }).to.throw(errors.GovObject.Proposal.start_epoch);
+
+    });
+    it('should throw error if end_epoch is invalid date', function() {
+        var proposal = new Proposal();
+
+        proposal.network = 'testnet';
+        proposal.end_epoch = 'not a date';
+        proposal.name = 'TestProposal';
+        proposal.payment_address = 'yXGeNPQXYFXhLAN1ZKrAjxzzBnZ2JZNKnh';
+        proposal.payment_amount = 10;
+        proposal.start_epoch = 1477872000;
+        proposal.type = 1;
+        proposal.url = "http://www.dash.org";
+        var expectedErr =new errors.GovObject.Proposal.invalidDate();
+        expect(proposal.getSerializationError().message).to.be.equal(expectedErr.message);
 
     });
 
@@ -204,6 +228,225 @@ describe('Proposal', function() {
         expect(proposal instanceof Proposal);
         proposal.serialize().should.equal(expectedHex);
     });
+    it('should return error if not valid stringified JSON',function(){
 
+    var stringifiedJSON = JSON.stringify(validJSONProposal);
+
+    //create an invalid stringified JSON
+    stringifiedJSON+="foobar";
+
+    var proposal = new Proposal();
+    var proposalRes = function(){
+      return proposal.fromObject(stringifiedJSON);
+    };
+    expect(proposalRes).to.throw(Error);
+    expect(proposalRes).to.throw('Must be a valid stringified JSON');
+  });
+  it('should return error if property name is missing',function(){
+    var jsonProposal = {
+      start_epoch:startDate,
+      end_epoch:endDate,
+      payment_address:'yXGeNPQXYFXhLAN1ZKrAjxzzBnZ2JZNKnh',
+      payment_amount:10,
+      type:1,
+      url:"http://www.dash.org"
+    };
+    var stringifiedJSON = JSON.stringify(jsonProposal);
+    var proposal = new Proposal();
+     var proposalRes = function(){
+       return proposal.fromObject(stringifiedJSON);
+     };
+
+     expect(proposalRes).to.throw(Error);
+     expect(proposalRes).to.throw('Must be a valid JSON - Property name missing');
+  });
+  it('should return error if property start_epoch is missing',function(){
+    //Cloning obj
+    var jsonProposal = JSON.parse(JSON.stringify(validJSONProposal));
+    delete jsonProposal.start_epoch;
+
+
+    var proposal = new Proposal();
+     var proposalRes = function(){
+       return proposal.fromObject(jsonProposal);
+     };
+
+     expect(proposalRes).to.throw(Error);
+     expect(proposalRes).to.throw('Must be a valid JSON - Property start_epoch missing');
+  });
+  it('should return error if property end_epoch is missing',function(){
+    //Cloning obj
+    var jsonProposal = JSON.parse(JSON.stringify(validJSONProposal));
+    delete jsonProposal.end_epoch;
+
+
+    var proposal = new Proposal();
+     var proposalRes = function(){
+       return proposal.fromObject(jsonProposal);
+     };
+
+     expect(proposalRes).to.throw(Error);
+     expect(proposalRes).to.throw('Must be a valid JSON - Property end_epoch missing');
+  });
+  it('should return error if property payment_address is missing',function(){
+    //Cloning obj
+    var jsonProposal = JSON.parse(JSON.stringify(validJSONProposal));
+    delete jsonProposal.payment_address;
+
+
+    var proposal = new Proposal();
+     var proposalRes = function(){
+       return proposal.fromObject(jsonProposal);
+     };
+
+     expect(proposalRes).to.throw(Error);
+     expect(proposalRes).to.throw('Must be a valid JSON - Property payment_address missing');
+  });
+  it('should return error if property payment_amount is missing',function(){
+    //Cloning obj
+    var jsonProposal = JSON.parse(JSON.stringify(validJSONProposal));
+    delete jsonProposal.payment_amount;
+
+
+    var proposal = new Proposal();
+     var proposalRes = function(){
+       return proposal.fromObject(jsonProposal);
+     };
+
+     expect(proposalRes).to.throw(Error);
+     expect(proposalRes).to.throw('Must be a valid JSON - Property payment_amount missing');
+  });
+  it('should return error if property type is missing',function(){
+    //Cloning obj
+    var jsonProposal = JSON.parse(JSON.stringify(validJSONProposal));
+    delete jsonProposal.type;
+
+
+    var proposal = new Proposal();
+     var proposalRes = function(){
+       return proposal.fromObject(jsonProposal);
+     };
+
+     expect(proposalRes).to.throw(Error);
+     expect(proposalRes).to.throw('Must be a valid JSON - Property type missing');
+  });
+  it('should return error if property url is missing',function(){
+    //Cloning obj
+    var jsonProposal = JSON.parse(JSON.stringify(validJSONProposal));
+    delete jsonProposal.url;
+
+
+    var proposal = new Proposal();
+     var proposalRes = function(){
+       return proposal.fromObject(jsonProposal);
+     };
+
+     expect(proposalRes).to.throw(Error);
+     expect(proposalRes).to.throw('Must be a valid JSON - Property url missing');
+  });
+  it('should return error if property name is bad typed',function(){
+    //Cloning obj
+    var jsonProposal = JSON.parse(JSON.stringify(validJSONProposal));
+    jsonProposal.name=1;
+
+    var proposal = new Proposal();
+     var proposalRes = function(){
+       return proposal.fromObject(jsonProposal);
+     };
+
+     expect(proposalRes).to.throw(Error);
+     expect(proposalRes).to.throw('Must be a valid JSON - Expected property name to be a string received:number');
+  });
+  it('should return error if property start_epoch is bad typed',function(){
+    //Cloning obj
+    var jsonProposal = JSON.parse(JSON.stringify(validJSONProposal));
+    jsonProposal.start_epoch="1";
+
+    var proposal = new Proposal();
+     var proposalRes = function(){
+       return proposal.fromObject(jsonProposal);
+     };
+
+     expect(proposalRes).to.throw(Error);
+     expect(proposalRes).to.throw('Must be a valid JSON - Expected property start_epoch to be a number received:string');
+  });
+  it('should return error if property end_epoch is bad typed',function(){
+    //Cloning obj
+    var jsonProposal = JSON.parse(JSON.stringify(validJSONProposal));
+    jsonProposal.end_epoch="1";
+
+    var proposal = new Proposal();
+     var proposalRes = function(){
+       return proposal.fromObject(jsonProposal);
+     };
+
+     expect(proposalRes).to.throw(Error);
+     expect(proposalRes).to.throw('Must be a valid JSON - Expected property end_epoch to be a number received:string');
+  });
+  it('should return error if property payment_address is bad typed',function(){
+    //Cloning obj
+    var jsonProposal = JSON.parse(JSON.stringify(validJSONProposal));
+    jsonProposal.payment_address=1;
+
+    var proposal = new Proposal();
+     var proposalRes = function(){
+       return proposal.fromObject(jsonProposal);
+     };
+
+     expect(proposalRes).to.throw(Error);
+     expect(proposalRes).to.throw('Must be a valid JSON - Expected property payment_address to be a string received:number');
+  });
+  it('should return error if property payment_amount is bad typed',function(){
+    //Cloning obj
+    var jsonProposal = JSON.parse(JSON.stringify(validJSONProposal));
+    jsonProposal.payment_amount="1";
+
+    var proposal = new Proposal();
+     var proposalRes = function(){
+       return proposal.fromObject(jsonProposal);
+     };
+
+     expect(proposalRes).to.throw(Error);
+     expect(proposalRes).to.throw('Must be a valid JSON - Expected property payment_amount to be a number received:string');
+  });
+  it('should return error if property type is bad typed',function(){
+    //Cloning obj
+    var jsonProposal = JSON.parse(JSON.stringify(validJSONProposal));
+    jsonProposal.type="1";
+
+    var proposal = new Proposal();
+     var proposalRes = function(){
+       return proposal.fromObject(jsonProposal);
+     };
+
+     expect(proposalRes).to.throw(Error);
+     expect(proposalRes).to.throw('Must be a valid JSON - Expected property type to be a number received:string');
+  });
+  it('should return error if property type is not a proposal',function(){
+    //Cloning obj
+    var jsonProposal = JSON.parse(JSON.stringify(validJSONProposal));
+    jsonProposal.type=42;
+
+    var proposal = new Proposal();
+     var proposalRes = function(){
+       return proposal.fromObject(jsonProposal);
+     };
+
+     expect(proposalRes).to.throw(Error);
+     expect(proposalRes).to.throw('Must be a valid proposal type.');
+  });
+  it('should return error if property url is bad typed',function(){
+    //Cloning obj
+    var jsonProposal = JSON.parse(JSON.stringify(validJSONProposal));
+    jsonProposal.url=1;
+
+    var proposal = new Proposal();
+     var proposalRes = function(){
+       return proposal.fromObject(jsonProposal);
+     };
+
+     expect(proposalRes).to.throw(Error);
+     expect(proposalRes).to.throw('Must be a valid JSON - Expected property url to be a string received:number');
+  });
 });
 var expectedHex = '5b5b2270726f706f73616c222c7b22656e645f65706f6368223a313736303035343430302c226e616d65223a225465737450726f706f73616c222c227061796d656e745f61646472657373223a22795847654e505158594658684c414e315a4b72416a787a7a426e5a324a5a4e4b6e68222c227061796d656e745f616d6f756e74223a31302c2273746172745f65706f6368223a313434343433353230302c2274797065223a312c2275726c223a22687474703a2f2f7777772e646173682e6f7267227d5d5d';

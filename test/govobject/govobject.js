@@ -29,9 +29,12 @@ describe('GovObject', function(){
       };
 
       govObject = govObject.fromObject(jsonProposal);
-
+      var govObjRes = function(){
+        return govObject.fromObject(jsonProposal);
+      };
       expect(govObject instanceof Proposal);
-
+      expect(govObjRes).to.not.throw(Error);
+      expect(govObjRes).to.not.throw('Unhandled GovObject type');
       govObject.serialize().should.equal(expectedHex);
     })
     it('should cast a stringified JSON Proposal into a Proposal Object', function(){
@@ -53,6 +56,99 @@ describe('GovObject', function(){
 
       govObject.serialize().should.equal(expectedHex);
     })
+    it('should return an error is stringified JSON Proposal is not valid', function(){
+      var govObject = new GovObject;
+      var jsonProposal = {
+        network:"testnet",
+        name:"TestProposal",
+        start_epoch:Math.round(new Date("2015-10-10").getTime()/1000),
+        end_epoch:Math.round(new Date("2025-10-10").getTime()/1000),
+        payment_address:'yXGeNPQXYFXhLAN1ZKrAjxzzBnZ2JZNKnh',
+        payment_amount:10,
+        type:1,
+        url:"http://www.dash.org"
+      };
+      var stringified = JSON.stringify(jsonProposal);
+      stringified+="foobar";
+
+       var govObjectRes = function(){
+         return govObject.fromObject(stringified);
+       };
+
+       expect(govObjectRes).to.throw(Error);
+       expect(govObjectRes).to.throw('Must be a valid stringified JSON');
+    })
+    it('should return error if property type is not defined',function(){
+      var govObject = new GovObject;
+      var jsonProposal = {
+        network:"testnet",
+        name:"TestProposal",
+        start_epoch:Math.round(new Date("2015-10-10").getTime()/1000),
+        end_epoch:Math.round(new Date("2025-10-10").getTime()/1000),
+        payment_address:'yXGeNPQXYFXhLAN1ZKrAjxzzBnZ2JZNKnh',
+        payment_amount:10,
+        url:"http://www.dash.org"
+      };
+
+       var govObjRes = function(){
+         return govObject.fromObject(jsonProposal);
+       };
+
+       expect(govObjRes).to.throw(Error);
+       expect(govObjRes).to.throw('Must be a valid JSON - Property type missing');
+    });
+    it('should return error if property type is bad typed',function(){
+      var govObject = new GovObject;
+      var jsonProposal = {
+        network:"testnet",
+        name:"TestProposal",
+        type:"foobar",
+        start_epoch:Math.round(new Date("2015-10-10").getTime()/1000),
+        end_epoch:Math.round(new Date("2025-10-10").getTime()/1000),
+        payment_address:'yXGeNPQXYFXhLAN1ZKrAjxzzBnZ2JZNKnh',
+        payment_amount:10,
+        url:"http://www.dash.org"
+      };
+
+       var govObjRes = function(){
+         return govObject.fromObject(jsonProposal);
+       };
+
+       expect(govObjRes).to.throw(Error);
+       expect(govObjRes).to.throw('Must be a valid JSON - Expected property type to be a number received:string');
+    });
+    it('should return error if govObject type is not handled',function(){
+      var govObject = new GovObject;
+      var jsonProposal = {
+        network:"testnet",
+        name:"TestProposal",
+        type:42,
+        start_epoch:Math.round(new Date("2015-10-10").getTime()/1000),
+        end_epoch:Math.round(new Date("2025-10-10").getTime()/1000),
+        payment_address:'yXGeNPQXYFXhLAN1ZKrAjxzzBnZ2JZNKnh',
+        payment_amount:10,
+        url:"http://www.dash.org"
+      };
+       var govObjRes = function(){
+         return govObject.fromObject(jsonProposal);
+       };
+
+       expect(govObjRes).to.throw(Error);
+       expect(govObjRes).to.throw('Unhandled GovObject type');
+    });
+    it('should output null data-hex value by default', function(){
+      var govObject = new GovObject;
+      expect(govObject.dataHex()).to.be.null();
+    })
+
+    it('should throw error when creating a bad new GovObject', function(){
+      var govObjRes = function(){
+        return  new GovObject(true);
+      };
+      expect(govObjRes).to.throw(Error);
+      expect(govObjRes).to.throw('Must provide an object or string to deserialize a transaction');
+    })
+
   });
 });
 var expectedHex = "5b5b2270726f706f73616c222c7b22656e645f65706f6368223a313736303035343430302c226e616d65223a225465737450726f706f73616c222c227061796d656e745f61646472657373223a22795847654e505158594658684c414e315a4b72416a787a7a426e5a324a5a4e4b6e68222c227061796d656e745f616d6f756e74223a31302c2273746172745f65706f6368223a313434343433353230302c2274797065223a312c2275726c223a22687474703a2f2f7777772e646173682e6f7267227d5d5d";
