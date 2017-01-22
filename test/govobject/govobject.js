@@ -56,6 +56,96 @@ describe('GovObject', function(){
 
       govObject.serialize().should.equal(expectedHex);
     })
+    it('should shallowCopy a govObject if passed as arg', function(){
+      var govObject = new GovObject;
+      var jsonProposal = {
+        network:"testnet",
+        name:"TestProposal",
+        start_epoch:Math.round(new Date("2015-10-10").getTime()/1000),
+        end_epoch:Math.round(new Date("2025-10-10").getTime()/1000),
+        payment_address:'yXGeNPQXYFXhLAN1ZKrAjxzzBnZ2JZNKnh',
+        payment_amount:10,
+        type:1,
+        url:"http://www.dash.org"
+      };
+      var govObject = govObject.fromObject(jsonProposal);
+      var newGovObject = new GovObject(govObject);
+      var shallowCopy = GovObject.shallowCopy(govObject);
+
+      //Have the same values
+      expect(shallowCopy).to.deep.equal(govObject);
+      //but are distinct object (not reference - === verif)
+      expect(shallowCopy).to.not.equal(govObject);
+
+      expect(newGovObject).to.deep.equal(govObject);
+      expect(newGovObject).to.not.equal(govObject);
+
+      expect(newGovObject).to.deep.equal(shallowCopy);
+      expect(newGovObject).to.not.equal(shallowCopy);
+
+    })
+    it('should create a govObject from a buffer', function(){
+      var govObject = new GovObject;
+      var jsonProposal = {
+        network:"testnet",
+        name:"TestProposal",
+        start_epoch:Math.round(new Date("2015-10-10").getTime()/1000),
+        end_epoch:Math.round(new Date("2025-10-10").getTime()/1000),
+        payment_address:'yXGeNPQXYFXhLAN1ZKrAjxzzBnZ2JZNKnh',
+        payment_amount:10,
+        type:1,
+        url:"http://www.dash.org"
+      };
+      var govObject = govObject.fromObject(jsonProposal);
+
+      var govFromBuffer = new GovObject;
+        govFromBuffer.fromBuffer(govObject.toBuffer()).should.deep.equal(govObject);
+        govFromBuffer.fromBuffer(govObject.toBuffer()).should.not.equal(govObject);
+      new GovObject(govObject.toBuffer()).should.deep.equal(govObject);
+      new GovObject(govObject.toBuffer()).should.not.equal(govObject);
+    })
+    it('should create a govObject from an Object', function(){
+      var govObject = new GovObject;
+      var jsonProposal = {
+        network:"testnet",
+        name:"TestProposal",
+        start_epoch:Math.round(new Date("2015-10-10").getTime()/1000),
+        end_epoch:Math.round(new Date("2025-10-10").getTime()/1000),
+        payment_address:'yXGeNPQXYFXhLAN1ZKrAjxzzBnZ2JZNKnh',
+        payment_amount:10,
+        type:1,
+        url:"http://www.dash.org"
+      };
+      var govObject = govObject.fromObject(jsonProposal);
+      var govObject2 = new GovObject;
+
+      new GovObject(Object.assign(new Object , govObject)).should.deep.equal(govObject);
+      new GovObject(Object.assign(new Object , govObject)).should.not.equal(govObject);
+
+      new GovObject(Object.assign(new Object , govObject)).should.deep.equal(govObject2.fromObject(jsonProposal))
+      new GovObject(Object.assign(new Object , govObject)).should.not.equal(govObject2.fromObject(jsonProposal))
+    })
+    it('should create a govObject from an hexa string', function(){
+      var govObject = new GovObject;
+      var jsonProposal = {
+        network:"testnet",
+        name:"TestProposal",
+        start_epoch:Math.round(new Date("2015-10-10").getTime()/1000),
+        end_epoch:Math.round(new Date("2025-10-10").getTime()/1000),
+        payment_address:'yXGeNPQXYFXhLAN1ZKrAjxzzBnZ2JZNKnh',
+        payment_amount:10,
+        type:1,
+        url:"http://www.dash.org"
+      };
+      var govObject = govObject.fromObject(jsonProposal);
+      var govFromHexa = new GovObject;
+
+      govFromHexa.fromString(govObject.toString()).should.deep.equal(govObject);
+      govFromHexa.fromString(govObject.toString()).should.not.equal(govObject);
+      new GovObject(govObject.toString()).should.deep.equal(govObject);
+      new GovObject(govObject.toString()).should.not.equal(govObject);
+    })
+
     it('should return an error is stringified JSON Proposal is not valid', function(){
       var govObject = new GovObject;
       var jsonProposal = {
