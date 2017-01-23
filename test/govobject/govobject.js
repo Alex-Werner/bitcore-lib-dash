@@ -129,11 +129,12 @@ describe('GovObject', function(){
       var govObject = govObject.fromObject(jsonProposal);
       var govObject2 = new GovObject;
 
-      new GovObject(Object.assign(new Object , govObject)).should.deep.equal(govObject);
-      new GovObject(Object.assign(new Object , govObject)).should.not.equal(govObject);
+      //Use a polyfill for object.assign FIXME when node>=4 (actual 0.10.25)
+      new GovObject(Object._assign(new Object , govObject)).should.deep.equal(govObject);
+      new GovObject(Object._assign(new Object , govObject)).should.not.equal(govObject);
 
-      new GovObject(Object.assign(new Object , govObject)).should.deep.equal(govObject2.fromObject(jsonProposal))
-      new GovObject(Object.assign(new Object , govObject)).should.not.equal(govObject2.fromObject(jsonProposal))
+      new GovObject(Object._assign(new Object , govObject)).should.deep.equal(govObject2.fromObject(jsonProposal))
+      new GovObject(Object._assign(new Object , govObject)).should.not.equal(govObject2.fromObject(jsonProposal))
     })
     it('should create a govObject from an hexa string', function(){
       var govObject = new GovObject;
@@ -285,3 +286,26 @@ describe('GovObject', function(){
   });
 });
 var expectedHex = "5b5b2270726f706f73616c222c7b22656e645f65706f6368223a313736303035343430302c226e616d65223a225465737450726f706f73616c222c227061796d656e745f61646472657373223a22795847654e505158594658684c414e315a4b72416a787a7a426e5a324a5a4e4b6e68222c227061796d656e745f616d6f756e74223a31302c2273746172745f65706f6368223a313434343433353230302c2274797065223a312c2275726c223a22687474703a2f2f7777772e646173682e6f7267227d5d5d";
+//Polyfill for object.assign (not supported in 0.10.25);
+Object._assign = function (target, varArgs) { // .length of function is 2
+  'use strict';
+  if (target == null) { // TypeError if undefined or null
+    throw new TypeError('Cannot convert undefined or null to object');
+  }
+
+  var to = Object(target);
+
+  for (var index = 1; index < arguments.length; index++) {
+    var nextSource = arguments[index];
+
+    if (nextSource != null) { // Skip over if undefined or null
+      for (var nextKey in nextSource) {
+        // Avoid bugs when hasOwnProperty is shadowed
+        if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
+          to[nextKey] = nextSource[nextKey];
+        }
+      }
+    }
+  }
+  return to;
+};
