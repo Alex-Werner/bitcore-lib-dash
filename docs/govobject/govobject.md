@@ -1,7 +1,51 @@
+# Governance Object API
+
+- [GovObject](#governance-object)
+    - [`new GovObject([govObjectData])`](#new-govobjectgovobjectdata)
+    - [Methods](#methods)
+        - [dataHex](#datahex)
+        - [fromObject](#fromobject)
+        - [fromString](#fromstring)
+        - [checkedSerialize](#checkedserialize)
+        - [serialize](#serialize)
+        - [inspect](#inspect)
+        - [toBuffer](#tobuffer)
+        - [fromBuffer](#frombuffer)
+        - [shallowCopy](#shallowcopy)
+- [Governance Object Creation](#governance-object-creation)
+- [Governance Object Types](#govobject-types)
+
+
 # Governance Object
 A Gov Object is a generic object which allow to create specific type to follow the Governance Object / Proposal system used in the Dash Core Team.   
 It aims to allow an easy way to manipulate Governance Object/Proposal Object for the Proposal Generator for exemple.   
 It use inheritance (with a first use with proposal), in order to allow to create other type that will extend the GovObject Methods.   
+
+### ̀`new GovObject([govObjectData])̀`
+
+Creates a new `GovObject` object where:
+  - `govObjectData` - optional data (allowed type are `json`, `jsonString`, `hex`, `buffer`, `GovObject`)
+
+### Methods
+
+####  `dataHex`  
+Returns a dataHex representation (see above)
+####  `fromObject`  
+Allow to create a govObj from a json or stringifiedJSON obj
+####  `fromString`
+Allow to create a govObj from an hex string
+####  `checkedSerialize`
+Return an hexa string that can be used in dashd CLI
+####  `serialize`
+Return an hexa string
+####  `inspect`
+Returns a representation of the object
+####  `toBuffer`
+Return a buffer
+####  `fromBuffer`
+Allow to create a govObject from a buffer
+####  `shallowCopy`
+Allow to shallowCopy from another govObject
 
 ## Governance Object creation
 There are many way to create a govObject
